@@ -7,6 +7,7 @@ export class User extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
+  
 
   @Field()
   @Column()

@@ -2,20 +2,23 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
-import { RegisterResolver } from "./modules/user/Register";
 import Express from "express";
-import session = require("express-session");
 import connectRedis from "connect-redis";
+import session from "express-session";
 import { config } from "dotenv";
 import cors from "cors";
-import { redis } from "./redis";
 
-config(); 
+import { RegisterResolver } from "./modules/user/Register";
+import { LoginResolver } from "./modules/user/Login";
+import { redis } from "./redis";
+import { MeResolver } from "./modules/user/Me";
+
+config();
 
 const main = async () => {
   await createConnection();
   const schema = await buildSchema({
-    resolvers: [RegisterResolver]
+    resolvers: [MeResolver, RegisterResolver, LoginResolver]
   });
   const apolloServer = new ApolloServer({
     schema,
@@ -24,7 +27,9 @@ const main = async () => {
   });
 
   const app = Express();
+
   const RedisStore = connectRedis(session);
+
   app.use(
     cors({
       credentials: true,
@@ -36,8 +41,8 @@ const main = async () => {
       store: new RedisStore({
         client: redis as any
       }),
+      secret: "royalty",
       name: "cookie",
-      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
       cookie: {

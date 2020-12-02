@@ -1,4 +1,4 @@
-import { UserDemo } from "src/entity/User.demo";
+import { UserDemo } from "../../entity/User.demo";
 import {
   Arg,
   FieldResolver,
